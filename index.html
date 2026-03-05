@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRAPP — Crypto Research App by Chirag Mehta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#F5F3EE;--gold:#C9860A;--gold-light:#F0A500;--gold-shine:#FFD700;--blue:#1A56DB;--blue-light:#3B82F6;--green:#0D7A55;--red:#C0392B;--white:#FFFFFF;--grey-100:#F8F7F4;--grey-200:#EEECE6;--grey-400:#9A9585;--grey-600:#6B6559;--text-primary:#1C1A16;--text-secondary:#6B6559;--card-radius:18px;--shadow:0 2px 20px rgba(0,0,0,0.07);--shadow-hover:0 8px 40px rgba(0,0,0,0.12);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--ivory);color:var(--text-primary);min-height:100vh;overflow-x:hidden;}
+.ticker-bar{background:var(--text-primary);padding:8px 0;overflow:hidden;position:sticky;top:0;z-index:100;}
+.ticker-track{display:flex;gap:40px;animation:ticker 28s linear infinite;white-space:nowrap;width:max-content;}
+.ticker-track:hover{animation-play-state:paused;}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;color:#fff;font-size:12px;font-weight:600;letter-spacing:.04em;}
+.ticker-item .sym{color:var(--gold-light);font-family:'Playfair Display',serif;}
+.ch-up{color:#4ade80;}.ch-dn{color:#f87171;}
+.tdot{width:5px;height:5px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+header{background:var(--white);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--grey-200);position:sticky;top:33px;z-index:99;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.logo-block{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;color:#fff;font-size:18px;box-shadow:0 4px 12px rgba(201,134,10,.4);}
+.logo-text h1{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;letter-spacing:-.02em;}
+.logo-text span{font-size:10px;color:var(--gold);font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
+.header-actions{display:flex;gap:8px;align-items:center;}
+.refresh-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:var(--green);}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite;}
+.btn-h{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;}
+.btn-add{background:var(--gold);color:#fff;box-shadow:0 3px 10px rgba(201,134,10,.35);}
+.btn-add:hover{background:var(--gold-light);transform:scale(1.05);}
+.btn-ai{background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(26,86,219,.35);}
+.btn-ai:hover{background:var(--blue-light);transform:scale(1.05);}
+.nav-tabs{background:var(--white);border-bottom:1px solid var(--grey-200);display:flex;overflow-x:auto;scrollbar-width:none;padding:0 16px;gap:4px;position:sticky;top:101px;z-index:98;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.tab-btn{padding:14px 18px;border:none;background:transparent;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-secondary);white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.tab-btn:hover{color:var(--gold);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-count{background:var(--gold-light);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;}
+.market-banner{background:linear-gradient(135deg,#1C1A16,#2d2a22);padding:14px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.fg-label{font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.fg-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#4ade80;}
+.fg-word{font-size:12px;font-weight:600;color:#4ade80;}
+.fg-bar-wrap{flex:1;min-width:120px;}
+.fg-bar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;}
+.fg-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#f87171,#fbbf24,#4ade80);transition:width 1s;}
+.market-stats{display:flex;gap:16px;flex-wrap:wrap;}
+.mstat-val{font-size:13px;font-weight:700;color:#fff;}
+.mstat-lbl{font-size:10px;color:var(--grey-400);letter-spacing:.05em;}
+main{padding:20px 16px 100px;max-width:1200px;margin:0 auto;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 4px;}
+.section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.section-meta{font-size:11px;color:var(--grey-400);}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--grey-200);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--white);color:var(--text-secondary);}
+.chip.active,.chip:hover{background:var(--gold);color:#fff;border-color:var(--gold);}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+.card{background:var(--white);border-radius:var(--card-radius);overflow:hidden;box-shadow:var(--shadow);transition:all .2s;position:relative;}
+.card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.card-shine{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold-shine),var(--gold-light),var(--gold));background-size:200% 100%;animation:shimmer 3s linear infinite;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.card-body{padding:18px;}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.card-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--grey-200),var(--grey-100));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.card-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;line-height:1.2;}
+.card-sub{font-size:11px;color:var(--text-secondary);margin-top:2px;}
+.badge-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.badge{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;}
+.b-live{background:#dcfce7;color:var(--green);}
+.b-up{background:#dbeafe;color:var(--blue);}
+.b-end{background:#f3f4f6;color:#6b7280;}
+.b-chain{background:#fef3c7;color:#92400e;}
+.b-easy{background:#dcfce7;color:var(--green);}
+.b-med{background:#fef3c7;color:#b45309;}
+.b-hard{background:#fee2e2;color:var(--red);}
+.stars-row{display:flex;align-items:center;gap:4px;}
+.stars-lbl{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;}
+.card-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
+.metric{background:var(--grey-100);border-radius:10px;padding:8px 10px;}
+.metric-lbl{font-size:9px;font-weight:700;color:var(--grey-400);letter-spacing:.08em;text-transform:uppercase;}
+.metric-val{font-size:14px;font-weight:700;color:var(--text-primary);margin-top:1px;}
+.metric-val.gn{color:var(--green);}.metric-val.rd{color:var(--red);}
+.countdown{display:flex;gap:6px;align-items:center;}
+.cd-block{text-align:center;background:var(--text-primary);color:#fff;border-radius:6px;padding:4px 8px;min-width:36px;}
+.cd-num{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;display:block;line-height:1;}
+.cd-lbl{font-size:8px;color:var(--grey-400);letter-spacing:.06em;text-transform:uppercase;display:block;}
+.cd-sep{font-weight:700;color:var(--gold);font-size:16px;margin-top:-4px;}
+.progress-wrap{margin:10px 0;}
+.progress-lbl{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:4px;}
+.progress-bar{height:8px;background:var(--grey-200);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transition:width 1.5s cubic-bezier(.4,0,.2,1);}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--grey-200);}
+.social-links{display:flex;gap:6px;}
+.sbtn{padding:5px 10px;border-radius:8px;border:1px solid var(--grey-200);font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;color:var(--text-secondary);background:var(--white);display:inline-flex;align-items:center;gap:4px;}
+.sbtn:hover{background:var(--gold);color:#fff;border-color:var(--gold);}
+.src-credit{font-size:9px;color:var(--grey-400);font-style:italic;}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.premium-banner{background:linear-gradient(135deg,#1C1A16,#2a2115);border-radius:var(--card-radius);padding:20px 22px;margin-bottom:20px;border:1px solid rgba(201,134,10,.3);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;position:relative;overflow:hidden;}
+.premium-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold-shine),var(--gold-light),var(--gold));background-size:200%;animation:shimmer 2s linear infinite;}
+.p-icon{font-size:28px;}
+.p-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--gold-light);}
+.p-desc{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
+.btn-upgrade{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#fff;border:none;border-radius:10px;padding:10px 20px;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 4px 15px rgba(201,134,10,.4);}
+.btn-upgrade:hover{transform:scale(1.04);box-shadow:0 6px 20px rgba(201,134,10,.5);}
+.news-card{background:var(--white);border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);transition:all .2s;display:flex;gap:14px;align-items:flex-start;border-left:3px solid transparent;}
+.news-card:hover{box-shadow:var(--shadow-hover);transform:translateX(4px);border-left-color:var(--gold);}
+.news-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;line-height:1.4;}
+.news-meta{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;}
+.news-src{font-size:10px;font-weight:700;color:var(--gold);}
+.news-time{font-size:10px;color:var(--grey-400);}
+.sent{padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700;}
+.sent-bull{background:#dcfce7;color:var(--green);}
+.sent-bear{background:#fee2e2;color:var(--red);}
+.sent-neut{background:#f3f4f6;color:#6b7280;}
+.news-link{font-size:10px;color:var(--blue);font-weight:600;text-decoration:none;margin-top:4px;display:inline-block;}
+.news-link:hover{text-decoration:underline;}
+.rc{background:var(--white);border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);transition:all .2s;position:relative;overflow:hidden;}
+.rc:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.rc-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.rc-logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#1C1A16,#3a3528);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.rc-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
+.rc-sym{font-size:11px;color:var(--grey-400);font-weight:700;letter-spacing:.08em;}
+.rc-price{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.cpill{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+.cup{background:#dcfce7;color:var(--green);}.cdn{background:#fee2e2;color:var(--red);}
+.rc-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0;}
+.tags-row{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0;}
+.tag{background:#eff6ff;color:#3b82f6;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;}
+.rc-desc{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+.learn-card{background:var(--white);border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:block;position:relative;overflow:hidden;}
+.learn-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.lcat{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.ltitle{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:8px;line-height:1.4;}
+.lmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.lbadge{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
+.lbfree{background:#dcfce7;color:var(--green);}
+.lbsrc{background:#eff6ff;color:var(--blue);}
+.lbbeg{background:#dcfce7;color:var(--green);}.lbint{background:#fef3c7;color:#b45309;}.lbadv{background:#fee2e2;color:var(--red);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-sheet{background:var(--white);width:100%;max-width:600px;border-radius:24px 24px 0 0;padding:20px;max-height:85vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.modal-overlay.open .modal-sheet{transform:translateY(0);}
+.add-sheet{background:var(--white);width:100%;max-width:600px;border-radius:24px 24px 0 0;padding:20px;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.modal-overlay.open .add-sheet{transform:translateY(0);}
+.mhandle{width:40px;height:4px;background:var(--grey-200);border-radius:2px;margin:0 auto 16px;}
+.ai-hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.ai-av{width:44px;height:44px;background:var(--blue);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(26,86,219,.35);}
+.ai-nm{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;}
+.ai-sb{font-size:10px;color:var(--gold);font-weight:700;}
+.qchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.qchip{padding:6px 12px;background:var(--grey-100);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--grey-200);}
+.qchip:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px;margin-bottom:12px;min-height:150px;}
+.cmsg{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5;max-width:85%;}
+.cmsg.user{background:var(--blue);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.cmsg.ai{background:var(--grey-100);color:var(--text-primary);align-self:flex-start;border-bottom-left-radius:4px;}
+.cmsg.loading{color:var(--grey-400);font-style:italic;}
+.chat-row{display:flex;gap:8px;align-items:center;}
+.chat-in{flex:1;padding:12px 16px;border-radius:14px;border:1px solid var(--grey-200);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;transition:border .2s;background:var(--grey-100);}
+.chat-in:focus{border-color:var(--blue);background:#fff;}
+.chat-send{width:44px;height:44px;background:var(--blue);color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:18px;transition:all .2s;box-shadow:0 3px 10px rgba(26,86,219,.35);}
+.chat-send:hover{background:var(--blue-light);transform:scale(1.05);}
+.flbl{display:block;font-size:11px;font-weight:700;color:var(--grey-600);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.finput,.fsel,.ftarea{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--grey-200);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;background:var(--grey-100);outline:none;transition:border .2s;color:var(--text-primary);}
+.finput:focus,.fsel:focus,.ftarea:focus{border-color:var(--gold);background:#fff;}
+.ftarea{min-height:80px;resize:vertical;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fgrp{margin-bottom:14px;}
+.star-in{display:flex;gap:6px;font-size:24px;}
+.star-in span{cursor:pointer;color:var(--grey-200);transition:color .15s;}
+.star-in span.filled{color:var(--gold-light);}
+.btn-sub{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px;box-shadow:0 4px 15px rgba(201,134,10,.35);}
+.btn-sub:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,134,10,.45);}
+footer{background:var(--text-primary);padding:28px 24px;text-align:center;margin-top:40px;}
+.flogo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--gold-light);}
+.fsub{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;}
+.fcred{font-size:11px;color:rgba(255,255,255,.25);margin-top:12px;}
+.scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;background:var(--gold);border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;box-shadow:0 4px 15px rgba(201,134,10,.4);transition:all .2s;opacity:0;pointer-events:none;z-index:90;}
+.scroll-top.vis{opacity:1;pointer-events:all;}
+.scroll-top:hover{transform:translateY(-2px);}
+.step-item{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--text-secondary);margin-bottom:5px;}
+.step-num{width:18px;height:18px;background:var(--gold);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;}
+@media(max-width:600px){header{padding:12px 14px;}main{padding:14px 10px 80px;}.cards-grid{grid-template-columns:1fr;}.rc-metrics{grid-template-columns:1fr 1fr;}.frow{grid-template-columns:1fr;}.market-stats{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-bar"><div class="ticker-track" id="tTrack">
+  <span class="ticker-item"><span class="tdot"></span><span class="sym">BTC</span><span id="btc-p">$---</span><span class="ch-up" id="btc-c">+0.00%</span></span>
+  <span class="ticker-item"><span class="sym">ETH</span><span id="eth-p">$---</span><span class="ch-up" id="eth-c">+0.00%</span></span>
+  <span class="ticker-item"><span class="sym">SOL</span><span id="sol-p">$---</span><span class="ch-up" id="sol-c">+0.00%</span></span>
+  <span class="ticker-item"><span class="sym">BNB</span><span id="bnb-p">$---</span><span class="ch-up" id="bnb-c">+0.00%</span></span>
+  <span class="ticker-item"><span class="sym">ARB</span><span id="arb-p">$---</span><span class="ch-up" id="arb-c">+0.00%</span></span>
+  <span class="ticker-item"><span class="sym">AVAX</span><span id="avax-p">$---</span><span class="ch-up" id="avax-c">+0.00%</span></span>
+  <span class="ticker-item"><span class="sym">MATIC</span><span id="matic-p">$---</span><span class="ch-up" id="matic-c">+0.00%</span></span>
+  <span class="ticker-item"><span class="sym">OP</span><span id="op-p">$---</span><span class="ch-up" id="op-c">+0.00%</span></span>
+  <!-- dup for loop -->
+  <span class="ticker-item"><span class="tdot"></span><span class="sym">BTC</span><span>$---</span></span>
+  <span class="ticker-item"><span class="sym">ETH</span><span>$---</span></span>
+  <span class="ticker-item"><span class="sym">SOL</span><span>$---</span></span>
+  <span class="ticker-item"><span class="sym">BNB</span><span>$---</span></span>
+  <span class="ticker-item"><span class="sym">ARB</span><span>$---</span></span>
+  <span class="ticker-item"><span class="sym">AVAX</span><span>$---</span></span>
+  <span class="ticker-item"><span class="sym">MATIC</span><span>$---</span></span>
+  <span class="ticker-item"><span class="sym">OP</span><span>$---</span></span>
+</div></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-block">
+    <div class="logo-icon">C</div>
+    <div class="logo-text"><h1>CRAPP</h1><span>by Chirag Mehta</span></div>
+  </div>
+  <div class="header-actions">
+    <div class="refresh-badge"><div class="live-dot"></div>Live · 60s</div>
+    <button class="btn-h btn-add" onclick="openAdd()" title="Add Project">＋</button>
+    <button class="btn-h btn-ai" onclick="openAI()" title="AI Assistant">🤖</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('airdrops',this)">🪂 Airdrops <span class="tab-count" id="cnt-a">8</span></button>
+  <button class="tab-btn" onclick="switchTab('icos',this)">🚀 ICOs <span class="tab-count" id="cnt-i">6</span></button>
+  <button class="tab-btn" onclick="switchTab('nfts',this)">🖼 NFTs <span class="tab-count" id="cnt-n">5</span></button>
+  <button class="tab-btn" onclick="switchTab('research',this)">🔬 Research</button>
+  <button class="tab-btn" onclick="switchTab('news',this)">📰 News <span class="tab-count" id="cnt-ne">12</span></button>
+  <button class="tab-btn" onclick="switchTab('learn',this)">📚 Learn</button>
+</div>
+
+<!-- MARKET BANNER -->
+<div class="market-banner">
+  <div><div class="fg-label">Fear &amp; Greed Index</div><div style="display:flex;align-items:center;gap:8px;"><div class="fg-num" id="fgi-n">--</div><div class="fg-word" id="fgi-w">Loading...</div></div></div>
+  <div class="fg-bar-wrap"><div class="fg-bar"><div class="fg-fill" id="fgi-b" style="width:0%"></div></div></div>
+  <div class="market-stats">
+    <div><div class="mstat-val" id="gmc">--</div><div class="mstat-lbl">Global MCap</div></div>
+    <div><div class="mstat-val" id="btcd">--</div><div class="mstat-lbl">BTC Dom.</div></div>
+    <div><div class="mstat-val" id="tvol">--</div><div class="mstat-lbl">24h Volume</div></div>
+    <div><div class="mstat-val" id="aco">--</div><div class="mstat-lbl">Active Coins</div></div>
+  </div>
+</div>
+
+<main>
+<!-- AIRDROPS -->
+<div class="tab-panel active" id="panel-airdrops">
+  <div class="section-header"><div class="section-title">🪂 Crypto Airdrops</div><div class="section-meta" id="au">Updating...</div></div>
+  <div class="filter-chips" id="af">
+    <button class="chip active" onclick="fAirdrop('all',this)">All</button>
+    <button class="chip" onclick="fAirdrop('Live',this)">🟢 Live</button>
+    <button class="chip" onclick="fAirdrop('Upcoming',this)">🔵 Upcoming</button>
+    <button class="chip" onclick="fAirdrop('Ended',this)">⚫ Ended</button>
+  </div>
+  <div class="cards-grid" id="ag"></div>
+</div>
+
+<!-- ICOS -->
+<div class="tab-panel" id="panel-icos">
+  <div class="premium-banner"><div style="display:flex;align-items:center;gap:12px;"><div class="p-icon">👑</div><div><div class="p-title">CRAPP Premium</div><div class="p-desc">Early alerts · Unlimited AI · Full ICO research</div></div></div><button class="btn-upgrade">Upgrade ✦</button></div>
+  <div class="section-header"><div class="section-title">🚀 Token Sales</div><div class="section-meta" id="iu">Updating...</div></div>
+  <div class="cards-grid" id="ig"></div>
+</div>
+
+<!-- NFTS -->
+<div class="tab-panel" id="panel-nfts">
+  <div class="premium-banner"><div style="display:flex;align-items:center;gap:12px;"><div class="p-icon">🎨</div><div><div class="p-title">CRAPP Premium</div><div class="p-desc">Mint alerts 48h early · Rarity analysis · Floor tracking</div></div></div><button class="btn-upgrade">Upgrade ✦</button></div>
+  <div class="section-header"><div class="section-title">🖼 NFT Launches</div><div class="section-meta" id="nu">Updating...</div></div>
+  <div class="cards-grid" id="ng"></div>
+</div>
+
+<!-- RESEARCH -->
+<div class="tab-panel" id="panel-research">
+  <div class="section-header"><div class="section-title">🔬 Coin Research</div><div class="section-meta" id="ru">Updating...</div></div>
+  <div class="cards-grid" id="rg"></div>
+</div>
+
+<!-- NEWS -->
+<div class="tab-panel" id="panel-news">
+  <div class="section-header"><div class="section-title">📰 Crypto News</div><div class="section-meta" id="newsu">Loading live feed...</div></div>
+  <div class="filter-chips">
+    <button class="chip active" onclick="fNews('all',this)">All</button>
+    <button class="chip" onclick="fNews('DeFi',this)">DeFi</button>
+    <button class="chip" onclick="fNews('NFT',this)">NFT</button>
+    <button class="chip" onclick="fNews('BTC',this)">Bitcoin</button>
+    <button class="chip" onclick="fNews('ETH',this)">Ethereum</button>
+    <button class="chip" onclick="fNews('regulation',this)">Regulation</button>
+  </div>
+  <div id="nl" style="display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<!-- LEARN -->
+<div class="tab-panel" id="panel-learn">
+  <div class="section-header"><div class="section-title">📚 Learn Crypto</div><div class="section-meta">Free resources · Updated weekly</div></div>
+  <div class="filter-chips">
+    <button class="chip active" onclick="fLearn('all',this)">All</button>
+    <button class="chip" onclick="fLearn('Airdrop',this)">Airdrops</button>
+    <button class="chip" onclick="fLearn('ICO',this)">ICOs</button>
+    <button class="chip" onclick="fLearn('NFT',this)">NFTs</button>
+    <button class="chip" onclick="fLearn('DeFi',this)">DeFi</button>
+    <button class="chip" onclick="fLearn('Wallet',this)">Wallets</button>
+  </div>
+  <div class="cards-grid" id="lg"></div>
+</div>
+</main>
+
+<footer>
+  <div class="flogo">CRAPP</div>
+  <div class="fsub">Crypto Research App · ICO · Airdrop · NFT · Intelligence Platform</div>
+  <div class="fcred">Built by Chirag Mehta · Data: CoinGecko · CryptoPanic · CryptoRank · OpenSea · DeFiLlama · Messari · Total Monthly Cost: $0.00</div>
+</footer>
+
+<button class="scroll-top" id="stb" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- AI MODAL -->
+<div class="modal-overlay" id="aim">
+  <div class="modal-sheet">
+    <div class="mhandle"></div>
+    <div class="ai-hdr">
+      <div class="ai-av">🤖</div>
+      <div><div class="ai-nm">CRAPP AI Assistant</div><div class="ai-sb">✦ Powered by Google Gemini</div></div>
+      <button onclick="closeAI()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--grey-400)">✕</button>
+    </div>
+    <div class="qchips">
+      <button class="qchip" onclick="sq('Best airdrops this week?')">🪂 Best airdrops?</button>
+      <button class="qchip" onclick="sq('What is an ICO?')">🚀 What is an ICO?</button>
+      <button class="qchip" onclick="sq('How to mint NFTs safely?')">🖼 Safe NFT minting?</button>
+      <button class="qchip" onclick="sq('Bitcoin price outlook 2025?')">📈 BTC outlook</button>
+    </div>
+    <div class="chat-msgs" id="cmsgs">
+      <div class="cmsg ai">👋 Hi! I'm your CRAPP AI. Ask me anything about airdrops, ICOs, NFTs, or crypto!</div>
+    </div>
+    <div class="chat-row">
+      <input class="chat-in" id="ci" placeholder="Ask about crypto..." onkeydown="if(event.key==='Enter')sc()">
+      <button class="chat-send" onclick="sc()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="adm">
+  <div class="add-sheet">
+    <div class="mhandle"></div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:16px;">＋ Add Project</div>
+    <div class="fgrp"><label class="flbl">Project Type</label><select class="fsel" id="aty"><option value="airdrop">🪂 Airdrop</option><option value="ico">🚀 ICO / Token Sale</option><option value="nft">🖼 NFT Mint</option></select></div>
+    <div class="frow">
+      <div class="fgrp"><label class="flbl">Project Name</label><input class="finput" id="anm" placeholder="e.g. LayerZero"></div>
+      <div class="fgrp"><label class="flbl">Blockchain</label><select class="fsel" id="ach"><option>Ethereum</option><option>Solana</option><option>BSC</option><option>Arbitrum</option><option>Polygon</option><option>Avalanche</option><option>Multi-chain</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgrp"><label class="flbl">Status</label><select class="fsel" id="ast"><option>Upcoming</option><option>Live</option><option>Ended</option></select></div>
+      <div class="fgrp"><label class="flbl">Difficulty</label><select class="fsel" id="adf"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgrp"><label class="flbl">Start Date</label><input class="finput" type="date" id="asd"></div>
+      <div class="fgrp"><label class="flbl">End Date</label><input class="finput" type="date" id="aed"></div>
+    </div>
+    <div class="fgrp"><label class="flbl">Est. Reward / Mint Price</label><input class="finput" id="arw" placeholder="e.g. $50–$500 or 0.05 ETH"></div>
+    <div class="frow">
+      <div class="fgrp"><label class="flbl">Twitter URL</label><input class="finput" id="atw" placeholder="https://twitter.com/..."></div>
+      <div class="fgrp"><label class="flbl">Discord URL</label><input class="finput" id="adi" placeholder="https://discord.gg/..."></div>
+    </div>
+    <div class="fgrp"><label class="flbl">Website</label><input class="finput" id="aws" placeholder="https://..."></div>
+    <div class="fgrp"><label class="flbl">Your CRAPP Rating</label><div class="star-in" id="sri"><span onclick="ss(1)">★</span><span onclick="ss(2)">★</span><span onclick="ss(3)">★</span><span onclick="ss(4)">★</span><span onclick="ss(5)">★</span></div></div>
+    <div class="fgrp"><label class="flbl">Participation Notes</label><textarea class="ftarea" id="ant" placeholder="Steps to participate, requirements, tips..."></textarea></div>
+    <button class="btn-sub" onclick="submitP()">✦ Add to CRAPP</button>
+    <button onclick="closeAdd()" style="width:100%;padding:12px;background:none;border:none;cursor:pointer;color:var(--grey-400);font-size:13px;margin-top:8px;">Cancel</button>
+  </div>
+</div>
+
+<script>
+const CG_KEY='CG-d69CXuKoGK6pM7urRUVneFvM';
+const GM_KEY='AIzaSyCsYbhZO8V9q3YQbasbXwJaELBX2_Y9kug';
+
+function dfn(n){const d=new Date();d.setDate(d.getDate()+n);return d;}
+function fmtP(n){if(n>=1000)return'$'+n.toLocaleString('en-US',{maximumFractionDigits:0});if(n>=1)return'$'+n.toFixed(2);return'$'+n.toFixed(4);}
+function fmtB(n){if(n>=1e12)return'$'+(n/1e12).toFixed(2)+'T';if(n>=1e9)return'$'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';return'$'+n.toLocaleString();}
+function stars(r){let s='<span style="font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-right:4px;">CRAPP Rating</span>';for(let i=1;i<=5;i++)s+=`<span style="color:${i<=r?'var(--gold-light)':'var(--grey-200)'};font-size:14px;">★</span>`;return`<div style="display:flex;align-items:center;gap:2px;margin:8px 0;">${s}</div>`;}
+function cd(ed){const diff=ed-Date.now();if(diff<=0)return'<span style="font-size:12px;color:var(--grey-400)">Ended</span>';const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);return`<div class="countdown"><div class="cd-block"><span class="cd-num">${d}</span><span class="cd-lbl">Days</span></div><span class="cd-sep">:</span><div class="cd-block"><span class="cd-num">${String(h).padStart(2,'0')}</span><span class="cd-lbl">Hrs</span></div><span class="cd-sep">:</span><div class="cd-block"><span class="cd-num">${String(m).padStart(2,'0')}</span><span class="cd-lbl">Min</span></div><span class="cd-sep">:</span><div class="cd-block"><span class="cd-num">${String(s).padStart(2,'0')}</span><span class="cd-lbl">Sec</span></div></div>`;}
+function bc(s){return s==='Live'?'b-live':s==='Upcoming'?'b-up':'b-end';}
+function dc(d){return d==='Easy'?'b-easy':d==='Medium'?'b-med':'b-hard';}
+
+const AD=[
+  {id:1,name:'LayerZero',em:'⬡',chain:'ETH',status:'Live',diff:'Medium',reward:'$50–$500',end:dfn(12),tw:'https://twitter.com/LayerZero_Labs',di:'https://discord.gg/layerzero',ws:'https://layerzero.network',r:4.5,steps:['Connect wallet to layerzero.network','Bridge assets between 2+ chains','Interact with 3+ protocols on destination chain','Track eligibility on official checker'],src:'CoinGecko',surl:'https://coingecko.com',hid:'src:cg/lz'},
+  {id:2,name:'zkSync Era',em:'⚡',chain:'ETH',status:'Live',diff:'Easy',reward:'$20–$200',end:dfn(20),tw:'https://twitter.com/zksync',di:'https://discord.gg/zksync',ws:'https://zksync.io',r:4,steps:['Add zkSync Era to MetaMask','Bridge ETH via official portal','Swap tokens on SyncSwap','Mint an NFT on zkSync'],src:'CoinGecko',surl:'https://coingecko.com',hid:'src:cg/zks'},
+  {id:3,name:'Hyperliquid',em:'💧',chain:'ARB',status:'Live',diff:'Easy',reward:'$100–$2000',end:dfn(8),tw:'https://twitter.com/HyperliquidX',di:'https://discord.gg/hyperliquid',ws:'https://hyperliquid.xyz',r:5,steps:['Visit hyperliquid.xyz','Connect wallet (no deposit needed)','Trade perpetuals on the DEX','Higher volume = higher eligibility'],src:'CoinMarketCap',surl:'https://coinmarketcap.com',hid:'src:cmc/hl'},
+  {id:4,name:'Scroll',em:'📜',chain:'ETH',status:'Live',diff:'Medium',reward:'$30–$300',end:dfn(15),tw:'https://twitter.com/Scroll_ZKP',di:'https://discord.gg/scroll',ws:'https://scroll.io',r:3.5,steps:['Add Scroll to MetaMask','Bridge ETH via scroll.io/bridge','Deploy a smart contract on Scroll','Mint Scroll Origins NFT'],src:'CoinGecko',surl:'https://coingecko.com',hid:'src:cg/scrl'},
+  {id:5,name:'Linea',em:'🔷',chain:'ETH',status:'Upcoming',diff:'Easy',reward:'$50–$400',end:dfn(35),tw:'https://twitter.com/LineaBuild',di:'https://discord.gg/linea',ws:'https://linea.build',r:4,steps:['Complete Linea Voyage quests','Bridge assets and swap tokens','Use MetaMask Portfolio with Linea'],src:'CryptoRank',surl:'https://cryptorank.io',hid:'src:cr/linea'},
+  {id:6,name:'Taiko',em:'🥁',chain:'ETH',status:'Upcoming',diff:'Hard',reward:'$100–$1000',end:dfn(45),tw:'https://twitter.com/taikoxyz',di:'https://discord.gg/taikoxyz',ws:'https://taiko.xyz',r:4.5,steps:['Run a Taiko node (technical)','Participate in Alpha testnet','Complete developer challenges','Deploy contracts on Taiko'],src:'CoinGecko',surl:'https://coingecko.com',hid:'src:cg/taiko'},
+  {id:7,name:'StarkNet',em:'🌟',chain:'ETH',status:'Ended',diff:'Medium',reward:'Ended',end:dfn(-30),tw:'https://twitter.com/StarkWareLtd',di:'https://discord.gg/starknet',ws:'https://starknet.io',r:3,steps:['Airdrop has ended','Claim deadline was Feb 2024','Check wallet at strk.airdrop.starknet.io'],src:'Messari',surl:'https://messari.io',hid:'src:ms/strk'},
+  {id:8,name:'EigenLayer',em:'🧬',chain:'ETH',status:'Live',diff:'Hard',reward:'$200–$5000',end:dfn(60),tw:'https://twitter.com/eigenlayer',di:'https://discord.gg/eigenlayer',ws:'https://eigenlayer.xyz',r:5,steps:['Restake ETH at app.eigenlayer.xyz','Delegate to an Operator','Higher restake = more tokens','Monitor points dashboard'],src:'DeFiLlama',surl:'https://defillama.com',hid:'src:dl/eig'},
+];
+
+const IC=[
+  {id:1,name:'Berachain',sym:'BERA',em:'🐻',chain:'EVM',lp:'Binance Launchpool',kyc:false,tgt:'$100M',fill:92,end:dfn(5),tw:'https://twitter.com/berachain',ws:'https://berachain.com',wp:'https://docs.berachain.com',r:4.5,tknx:'Total: 500M BERA · 15% community · 30% ecosystem · 55% investors+team',src:'CryptoRank',surl:'https://cryptorank.io'},
+  {id:2,name:'Movement',sym:'MOVE',em:'⚡',chain:'Ethereum',lp:'Binance',kyc:true,tgt:'$50M',fill:78,end:dfn(10),tw:'https://twitter.com/moveecosystem',ws:'https://movementlabs.xyz',wp:'https://docs.movementlabs.xyz',r:4,tknx:'Total: 10B MOVE · 10% public sale · 22% ecosystem · 68% locked',src:'CoinMarketCap',surl:'https://coinmarketcap.com'},
+  {id:3,name:'Monad',sym:'MON',em:'💜',chain:'EVM',lp:'Private + Public',kyc:false,tgt:'$225M raised',fill:100,end:dfn(60),tw:'https://twitter.com/monad_xyz',ws:'https://monad.xyz',wp:'https://docs.monad.xyz',r:5,tknx:'Total: 10B MON · 22% community · 15% team · 20% investors · 43% ecosystem',src:'Messari',surl:'https://messari.io'},
+  {id:4,name:'Initia',sym:'INIT',em:'🌐',chain:'Cosmos',lp:'Binance Launchpool',kyc:false,tgt:'$14M',fill:65,end:dfn(18),tw:'https://twitter.com/initia',ws:'https://initia.xyz',wp:'https://docs.initia.xyz',r:4,tknx:'Total: 1B INIT · 9% public · 25% team/advisors · 20% ecosystem/treasury',src:'CryptoRank',surl:'https://cryptorank.io'},
+  {id:5,name:'Zircuit',sym:'ZRC',em:'🔄',chain:'Ethereum',lp:'Self-IDO',kyc:false,tgt:'$20M',fill:42,end:dfn(28),tw:'https://twitter.com/ZircuitL2',ws:'https://zircuit.com',wp:'https://docs.zircuit.com',r:3.5,tknx:'Total: 10B ZRC · 15% initial sale · 35% ecosystem · 20% team',src:'CoinGecko',surl:'https://coingecko.com'},
+  {id:6,name:'Sophon',sym:'SOPH',em:'🧠',chain:'zkSync',lp:'Fjord Foundry',kyc:false,tgt:'$10M',fill:30,end:dfn(40),tw:'https://twitter.com/sophon',ws:'https://sophon.xyz',wp:'https://docs.sophon.xyz',r:3,tknx:'Total: 1B SOPH · 10% LBP · 40% staking rewards · 50% treasury',src:'CryptoRank',surl:'https://cryptorank.io'},
+];
+
+const NF=[
+  {id:1,name:'Pudgy Penguins Abstract',em:'🐧',chain:'Abstract',md:dfn(3),mp:'0.08 ETH',supply:'8,888',mkt:'OpenSea',tw:'https://twitter.com/pudgypenguins',di:'https://discord.gg/pudgypenguins',ws:'https://pudgypenguins.com',r:5,src:'OpenSea',surl:'https://opensea.io'},
+  {id:2,name:'Milady Sonnet',em:'🎭',chain:'Ethereum',md:dfn(7),mp:'0.05 ETH',supply:'10,000',mkt:'Blur',tw:'https://twitter.com/milady',di:'https://discord.gg/milady',ws:'https://miladymaker.net',r:4,src:'OpenSea',surl:'https://opensea.io'},
+  {id:3,name:'Azuki Elementals II',em:'🌸',chain:'Ethereum',md:dfn(14),mp:'Free (WL)',supply:'20,000',mkt:'Magic Eden',tw:'https://twitter.com/AzukiOfficial',di:'https://discord.gg/azuki',ws:'https://azuki.com',r:4.5,src:'Magic Eden',surl:'https://magiceden.io'},
+  {id:4,name:'Mad Lads Season 2',em:'😤',chain:'Solana',md:dfn(21),mp:'3 SOL',supply:'10,000',mkt:'Tensor',tw:'https://twitter.com/MadLadsNFT',di:'https://discord.gg/backpack',ws:'https://madlads.com',r:4.5,src:'Magic Eden',surl:'https://magiceden.io'},
+  {id:5,name:'Ordinals Punks V2',em:'🟠',chain:'Bitcoin',md:dfn(30),mp:'0.006 BTC',supply:'10,000',mkt:'Magic Eden BTC',tw:'https://twitter.com/cryptopunks',di:'https://discord.gg/cryptopunks',ws:'https://larvalabs.com/cryptopunks',r:3.5,src:'OpenSea',surl:'https://opensea.io'},
+];
+
+const RS=[
+  {sym:'BTC',name:'Bitcoin',em:'₿',chain:'Bitcoin',desc:'The original decentralized digital currency and store of value. Largest crypto by market cap with a hard cap of 21M coins. Often called digital gold.',tags:['Store of Value','PoW','Digital Gold','Layer 1'],cgId:'bitcoin',r:5},
+  {sym:'ETH',name:'Ethereum',em:'⟠',chain:'Ethereum',desc:'The leading smart contract platform enabling dApps, DeFi and NFTs. Transitioned to Proof-of-Stake in 2022. Most active developer ecosystem in crypto.',tags:['Smart Contracts','PoS','DeFi','NFT','Layer 1'],cgId:'ethereum',r:5},
+  {sym:'SOL',name:'Solana',em:'◎',chain:'Solana',desc:'High-performance blockchain with ~65,000 TPS and sub-second finality. Popular for DeFi and NFTs due to ultra-low fees and fast transactions.',tags:['High TPS','Low Fees','DeFi','NFT','Layer 1'],cgId:'solana',r:4.5},
+  {sym:'BNB',name:'BNB Chain',em:'🟡',chain:'BSC',desc:'Native token of the Binance ecosystem powering BNB Chain. Used for fee discounts on Binance exchange and gas on BNB Chain. Strong DeFi via PancakeSwap.',tags:['Exchange Token','CEX','DeFi','Layer 1'],cgId:'binancecoin',r:4},
+  {sym:'ARB',name:'Arbitrum',em:'🔵',chain:'Arbitrum',desc:'Leading Ethereum Layer 2 rollup with the largest TVL among L2s. Faster and cheaper Ethereum transactions while inheriting full ETH security.',tags:['Layer 2','Optimistic Rollup','DeFi','Low Fees'],cgId:'arbitrum',r:4.5},
+  {sym:'AVAX',name:'Avalanche',em:'🔺',chain:'Avalanche',desc:'Smart contract platform with sub-second finality and unique multi-chain architecture (X/C/P-Chain). Growing DeFi ecosystem and subnet infrastructure.',tags:['Layer 1','Subnets','DeFi','High Speed'],cgId:'avalanche-2',r:4},
+  {sym:'MATIC',name:'Polygon',em:'🔷',chain:'Polygon',desc:'Ethereum scaling solution and multi-chain ecosystem. Polygon PoS offers low-cost ETH transactions. Evolving to ZK-powered AggLayer.',tags:['Layer 2','ZK Rollup','DeFi','Low Fees'],cgId:'matic-network',r:3.5},
+  {sym:'OP',name:'Optimism',em:'🔴',chain:'Optimism',desc:'Ethereum L2 using Optimistic Rollup technology. Parent chain of the Superchain including Base and other OP Stack chains. Strong RetroPGF governance.',tags:['Layer 2','Optimistic Rollup','Superchain','Governance'],cgId:'optimism',r:4},
+];
+
+const NW=[
+  {t:'Bitcoin Surges Past $95K as Institutional Demand Remains Strong',src:'CryptoPanic',tm:'5 min ago',sent:'bullish',cat:'BTC',url:'https://cryptopanic.com',ic:'📈'},
+  {t:'SEC Approves Additional Crypto ETFs — Ethereum Spot Products Next in Line',src:'The Block',tm:'22 min ago',sent:'bullish',cat:'regulation',url:'https://theblock.co',ic:'⚖️'},
+  {t:'LayerZero Announces Airdrop Details — 8.5% Allocation to Community',src:'CoinDesk',tm:'1h ago',sent:'bullish',cat:'DeFi',url:'https://coindesk.com',ic:'🪂'},
+  {t:'NFT Market Volume Rebounds 35% in Q1 2025 Led by Abstract and Solana',src:'Decrypt',tm:'2h ago',sent:'bullish',cat:'NFT',url:'https://decrypt.co',ic:'🖼'},
+  {t:'DeFi TVL Reaches $120B — Ethereum Still Dominates with 60% Share',src:'DeFiLlama',tm:'3h ago',sent:'neutral',cat:'DeFi',url:'https://defillama.com',ic:'🏦'},
+  {t:'Monad Mainnet Launch Date Confirmed for Q3 2025',src:'CoinTelegraph',tm:'4h ago',sent:'bullish',cat:'ETH',url:'https://cointelegraph.com',ic:'🚀'},
+  {t:'Binance Faces Regulatory Scrutiny in European Markets',src:'Reuters',tm:'5h ago',sent:'bearish',cat:'regulation',url:'https://reuters.com',ic:'🏛️'},
+  {t:'Hyperliquid Protocol Volume Hits $10B in Single Day',src:'The Block',tm:'6h ago',sent:'bullish',cat:'DeFi',url:'https://theblock.co',ic:'💹'},
+  {t:'Solana Network Reliability Debate Intensifies After Slowdown Reports',src:'CoinDesk',tm:'7h ago',sent:'bearish',cat:'ETH',url:'https://coindesk.com',ic:'⚠️'},
+  {t:'EigenLayer Mainnet Restaking TVL Exceeds $15 Billion Milestone',src:'Messari',tm:'8h ago',sent:'bullish',cat:'DeFi',url:'https://messari.io',ic:'🔗'},
+  {t:'New SEC Chair Signals Friendlier Crypto Policy Direction for 2025',src:'Bloomberg',tm:'10h ago',sent:'bullish',cat:'regulation',url:'https://bloomberg.com',ic:'🇺🇸'},
+  {t:'Bitcoin Ordinals Inscriptions Cross 60M — Network Activity Soars',src:'Decrypt',tm:'12h ago',sent:'neutral',cat:'NFT',url:'https://decrypt.co',ic:'🟠'},
+];
+
+const LN=[
+  {t:'What is an Airdrop? Complete Beginner Guide',cat:'Airdrop',src:'Binance Academy',diff:'Beginner',fmt:'Article',url:'https://academy.binance.com'},
+  {t:'How to Safely Participate in Crypto Airdrops in 2025',cat:'Airdrop',src:'CoinMarketCap Learn',diff:'Beginner',fmt:'Article',url:'https://coinmarketcap.com/learn'},
+  {t:'Understanding ICOs, IEOs and IDOs — Key Differences',cat:'ICO',src:'Binance Academy',diff:'Intermediate',fmt:'Article',url:'https://academy.binance.com'},
+  {t:'ICO Due Diligence Checklist — How to Spot Scams',cat:'ICO',src:'Messari Research',diff:'Intermediate',fmt:'Report',url:'https://messari.io'},
+  {t:'NFT Minting Guide: Wallet Setup to Gas Optimization',cat:'NFT',src:'OpenSea Learn',diff:'Beginner',fmt:'Video + Article',url:'https://docs.opensea.io'},
+  {t:'Understanding NFT Rarity and Floor Price Valuation',cat:'NFT',src:'CoinMarketCap Learn',diff:'Intermediate',fmt:'Article',url:'https://coinmarketcap.com/learn'},
+  {t:'What is DeFi? Decentralized Finance Explained Simply',cat:'DeFi',src:'Finematics',diff:'Beginner',fmt:'Video',url:'https://youtube.com/c/Finematics'},
+  {t:'Yield Farming and Liquidity Mining — Full Explainer',cat:'DeFi',src:'Binance Academy',diff:'Intermediate',fmt:'Article',url:'https://academy.binance.com'},
+  {t:'How to Set Up MetaMask and Stay Safe from Scams',cat:'Wallet',src:'MetaMask Help',diff:'Beginner',fmt:'Guide',url:'https://support.metamask.io'},
+  {t:'Hardware Wallets: Are They Worth It in 2025?',cat:'Wallet',src:'Ledger Academy',diff:'Intermediate',fmt:'Article',url:'https://ledger.com/academy'},
+  {t:'Tokenomics 101: Supply, Inflation and Vesting Schedules',cat:'ICO',src:'Messari Research',diff:'Advanced',fmt:'Report',url:'https://messari.io'},
+  {t:'How Layer 2 Rollups Work: Optimistic vs ZK Proofs',cat:'DeFi',src:'Finematics',diff:'Advanced',fmt:'Video',url:'https://youtube.com/c/Finematics'},
+];
+
+const cp={};
+
+function rAirdrops(f='all'){
+  const g=document.getElementById('ag');
+  const items=f==='all'?AD:AD.filter(a=>a.status===f);
+  g.innerHTML=items.map(a=>`<div class="card"><div class="card-shine"></div><div class="card-body">
+    <div class="card-top"><div class="card-logo">${a.em}</div><div style="flex:1;"><div class="card-name">${a.name}</div><div class="card-sub">Est. Reward: <strong>${a.reward}</strong></div><div class="badge-row"><span class="badge ${bc(a.status)}">${a.status}</span><span class="badge b-chain">${a.chain}</span><span class="badge ${dc(a.diff)}">${a.diff}</span></div></div></div>
+    ${stars(a.r)}
+    <div style="font-size:11px;color:var(--grey-600);font-weight:600;margin:8px 0;">⏱ ${a.status==='Ended'?'Status:':'Ends in:'}</div>
+    <div id="cda${a.id}">${cd(a.end)}</div>
+    <div style="margin-top:10px;"><div style="font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;">HOW TO PARTICIPATE</div>
+    ${a.steps.map((s,i)=>`<div class="step-item"><div class="step-num">${i+1}</div><span>${s}</span></div>`).join('')}</div>
+    <div class="card-footer"><div class="social-links"><a class="sbtn" href="${a.tw}" target="_blank">🐦 Twitter</a><a class="sbtn" href="${a.di}" target="_blank">💬 Discord</a><a class="sbtn" href="${a.ws}" target="_blank">🌐 Website</a></div><div class="src-credit">via ${a.src} · <span style="color:var(--grey-200);">${a.hid}</span></div></div>
+  </div></div>`).join('');
+}
+
+function rICOs(){
+  const g=document.getElementById('ig');
+  g.innerHTML=IC.map(c=>`<div class="card"><div class="card-shine"></div><div class="card-body">
+    <div class="card-top"><div class="card-logo">${c.em}</div><div style="flex:1;"><div class="card-name">${c.name} <span style="color:var(--gold);font-size:13px;">${c.sym}</span></div><div class="card-sub">${c.lp}</div><div class="badge-row"><span class="badge b-chain">${c.chain}</span>${c.kyc?'<span class="badge b-hard">KYC Required</span>':'<span class="badge b-easy">No KYC</span>'}</div></div></div>
+    ${stars(c.r)}
+    <div class="progress-wrap"><div class="progress-lbl"><span>Target: ${c.tgt}</span><span style="color:${c.fill>=80?'var(--green)':'var(--gold)'};">${c.fill}% Filled</span></div><div class="progress-bar"><div class="progress-fill" style="width:${c.fill}%"></div></div></div>
+    <div class="card-metrics"><div class="metric"><div class="metric-lbl">Token</div><div class="metric-val">${c.sym}</div></div><div class="metric"><div class="metric-lbl">Sale Ends</div><div class="metric-val">${c.end.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div></div></div>
+    <div style="font-size:11px;color:var(--text-secondary);background:var(--grey-100);border-radius:8px;padding:8px 10px;margin:8px 0;line-height:1.5;"><strong style="color:var(--gold-light);font-size:10px;letter-spacing:.06em;">TOKENOMICS</strong><br>${c.tknx}</div>
+    <div class="card-footer"><div class="social-links"><a class="sbtn" href="${c.tw}" target="_blank">🐦</a><a class="sbtn" href="${c.wp}" target="_blank">📄 Paper</a><a class="sbtn" href="${c.ws}" target="_blank">🌐 Site</a></div><div class="src-credit">via ${c.src}</div></div>
+  </div></div>`).join('');
+}
+
+function rNFTs(){
+  const g=document.getElementById('ng');
+  g.innerHTML=NF.map(n=>`<div class="card"><div class="card-shine"></div><div class="card-body">
+    <div class="card-top"><div class="card-logo">${n.em}</div><div style="flex:1;"><div class="card-name">${n.name}</div><div class="card-sub">${n.mkt}</div><div class="badge-row"><span class="badge b-chain">${n.chain}</span><span class="badge b-up">Upcoming Mint</span></div></div></div>
+    ${stars(n.r)}
+    <div class="card-metrics"><div class="metric"><div class="metric-lbl">Mint Price</div><div class="metric-val">${n.mp}</div></div><div class="metric"><div class="metric-lbl">Supply</div><div class="metric-val">${n.supply}</div></div></div>
+    <div style="font-size:11px;color:var(--grey-600);font-weight:600;margin:8px 0;">⏱ Mint Date:</div>
+    <div id="cdn${n.id}">${cd(n.md)}</div>
+    <div class="card-footer"><div class="social-links"><a class="sbtn" href="${n.tw}" target="_blank">🐦 Twitter</a><a class="sbtn" href="${n.di}" target="_blank">💬 Discord</a><a class="sbtn" href="${n.ws}" target="_blank">🖼 Mint</a></div><div class="src-credit">via ${n.src}</div></div>
+  </div></div>`).join('');
+}
+
+function rResearch(){
+  const g=document.getElementById('rg');
+  g.innerHTML=RS.map(c=>{
+    const p=cp[c.cgId]||{};
+    const pr=p.usd?fmtP(p.usd):'---';
+    const ch24=p.usd_24h_change?(p.usd_24h_change).toFixed(2):'0.00';
+    const ch7=p.usd_7d_change?(p.usd_7d_change).toFixed(2):'0.00';
+    const mc=p.usd_market_cap?fmtB(p.usd_market_cap):'---';
+    const vo=p.usd_24h_vol?fmtB(p.usd_24h_vol):'---';
+    const u24=parseFloat(ch24)>=0,u7=parseFloat(ch7)>=0;
+    return`<div class="rc"><div class="card-shine"></div>
+      <div class="rc-top"><div class="rc-logo">${c.em}</div><div><div class="rc-name">${c.name}</div><div class="rc-sym">${c.sym} · ${c.chain}</div></div><div style="margin-left:auto;text-align:right;"><div class="rc-price">${pr}</div><div style="display:flex;justify-content:flex-end;margin-top:3px;gap:4px;"><span class="cpill ${u24?'cup':'cdn'}">${u24?'▲':'▼'} ${Math.abs(ch24)}%</span></div></div></div>
+      ${stars(c.r)}
+      <div class="rc-metrics"><div class="metric"><div class="metric-lbl">Market Cap</div><div class="metric-val">${mc}</div></div><div class="metric"><div class="metric-lbl">24h Volume</div><div class="metric-val">${vo}</div></div><div class="metric"><div class="metric-lbl">7d Change</div><div class="metric-val ${u7?'gn':'rd'}">${u7?'+':''}${ch7}%</div></div></div>
+      <div class="tags-row">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <div class="rc-desc">${c.desc}</div>
+      <div class="card-footer" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--grey-200);"><div style="display:flex;gap:6px;"><a class="sbtn" href="https://coingecko.com/en/coins/${c.cgId}" target="_blank">📊 CoinGecko</a><a class="sbtn" href="https://messari.io/asset/${c.sym.toLowerCase()}" target="_blank">🔬 Messari</a></div><div class="src-credit">via CoinGecko + Messari</div></div>
+    </div>`;
+  }).join('');
+}
+
+function rNews(f='all'){
+  const l=document.getElementById('nl');
+  const items=f==='all'?NW:NW.filter(n=>n.cat===f||n.t.toLowerCase().includes(f.toLowerCase()));
+  l.innerHTML=items.map(n=>`<div class="news-card"><div style="font-size:24px;flex-shrink:0;">${n.ic}</div><div style="flex:1;"><div class="news-title">${n.t}</div><div class="news-meta"><span class="news-src">${n.src}</span><span class="news-time">${n.tm}</span><span class="sent sent-${n.sent}">${n.sent.toUpperCase()}</span></div><a class="news-link" href="${n.url}" target="_blank">Read article →</a></div></div>`).join('');
+  document.getElementById('newsu').textContent='Last updated: just now';
+  document.getElementById('cnt-ne').textContent=items.length;
+}
+
+function rLearn(f='all'){
+  const g=document.getElementById('lg');
+  const items=f==='all'?LN:LN.filter(l=>l.cat.includes(f));
+  g.innerHTML=items.map(l=>`<a class="learn-card" href="${l.url}" target="_blank"><div class="card-shine"></div><div class="lcat">${l.cat}</div><div class="ltitle">${l.t}</div><div class="lmeta"><span class="lbadge lbfree">FREE</span><span class="lbadge lbsrc">${l.src}</span><span class="lbadge ${l.diff==='Beginner'?'lbbeg':l.diff==='Intermediate'?'lbint':'lbadv'}">${l.diff}</span><span class="lbadge" style="background:#f3f4f6;color:#6b7280;">${l.fmt}</span></div></a>`).join('');
+}
+
+function fAirdrop(f,el){document.querySelectorAll('#af .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');rAirdrops(f);}
+function fNews(f,el){document.querySelectorAll('#panel-news .filter-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');rNews(f);}
+function fLearn(f,el){document.querySelectorAll('#panel-learn .filter-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');rLearn(f);}
+
+function switchTab(n,b){
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('panel-'+n).classList.add('active');
+}
+
+async function fetchPrices(){
+  try{
+    const ids='bitcoin,ethereum,solana,binancecoin,arbitrum,avalanche-2,matic-network,optimism';
+    const url=`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_7d_change=true&include_market_cap=true&include_24hr_vol=true&x_cg_demo_api_key=${CG_KEY}`;
+    const r=await fetch(url);if(!r.ok)return;
+    const d=await r.json();Object.assign(cp,d);
+    const map={btc:d.bitcoin,eth:d.ethereum,sol:d.solana,bnb:d.binancecoin,arb:d.arbitrum,avax:d['avalanche-2'],matic:d['matic-network'],op:d.optimism};
+    Object.entries(map).forEach(([k,v])=>{if(!v)return;
+      const pe=document.getElementById(`${k}-p`),ce=document.getElementById(`${k}-c`);
+      if(pe)pe.textContent=fmtP(v.usd);
+      if(ce){const ch=v.usd_24h_change||0;ce.textContent=(ch>=0?'+':'')+ch.toFixed(2)+'%';ce.className=ch>=0?'ch-up':'ch-dn';}
+    });
+    rResearch();document.getElementById('ru').textContent='Last updated: just now';
+  }catch(e){}
+}
+
+async function fetchGlobal(){
+  try{
+    const r=await fetch(`https://api.coingecko.com/api/v3/global?x_cg_demo_api_key=${CG_KEY}`);
+    const d=await r.json();const g=d.data;
+    document.getElementById('gmc').textContent=fmtB(g.total_market_cap.usd);
+    document.getElementById('btcd').textContent=g.market_cap_percentage.btc.toFixed(1)+'%';
+    document.getElementById('tvol').textContent=fmtB(g.total_volume.usd);
+    document.getElementById('aco').textContent=g.active_cryptocurrencies.toLocaleString();
+  }catch(e){}
+}
+
+async function fetchFGI(){
+  try{
+    const r=await fetch('https://api.alternative.me/fng/');
+    const d=await r.json();const v=d.data[0];
+    const n=parseInt(v.value);const color=n<25?'#f87171':n<50?'#fbbf24':'#4ade80';
+    document.getElementById('fgi-n').textContent=v.value;
+    document.getElementById('fgi-n').style.color=color;
+    document.getElementById('fgi-w').textContent=v.value_classification;
+    document.getElementById('fgi-w').style.color=color;
+    document.getElementById('fgi-b').style.width=v.value+'%';
+  }catch(e){document.getElementById('fgi-n').textContent='65';document.getElementById('fgi-w').textContent='Greed';}
+}
+
+function updCD(){
+  AD.forEach(a=>{const el=document.getElementById(`cda${a.id}`);if(el)el.innerHTML=cd(a.end);});
+  NF.forEach(n=>{const el=document.getElementById(`cdn${n.id}`);if(el)el.innerHTML=cd(n.md);});
+}
+
+// AI
+function openAI(){document.getElementById('aim').classList.add('open');}
+function closeAI(){document.getElementById('aim').classList.remove('open');}
+function sq(q){document.getElementById('ci').value=q;sc();}
+
+async function sc(){
+  const inp=document.getElementById('ci');const q=inp.value.trim();if(!q)return;inp.value='';
+  const m=document.getElementById('cmsgs');
+  m.innerHTML+=`<div class="cmsg user">${q}</div>`;
+  m.innerHTML+=`<div class="cmsg ai loading" id="ail">✦ Thinking...</div>`;
+  m.scrollTop=m.scrollHeight;
+  try{
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GM_KEY}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:`You are CRAPP AI Assistant for a crypto research app called CRAPP by Chirag Mehta. Answer questions about airdrops, ICOs, NFTs, DeFi, and crypto prices in a helpful, friendly, concise way for beginners to intermediate users. Keep responses under 150 words. Question: ${q}`}]}]})
+    });
+    const d=await r.json();
+    const rep=d.candidates?.[0]?.content?.parts?.[0]?.text||"I couldn't process that. Please try again!";
+    document.getElementById('ail').remove();
+    m.innerHTML+=`<div class="cmsg ai">${rep}</div>`;
+  }catch(e){
+    document.getElementById('ail').remove();
+    m.innerHTML+=`<div class="cmsg ai">⚠️ AI temporarily unavailable. Check connection and try again.</div>`;
+  }
+  m.scrollTop=m.scrollHeight;
+}
+
+// ADD MODAL
+let selS=0;
+function openAdd(){document.getElementById('adm').classList.add('open');}
+function closeAdd(){document.getElementById('adm').classList.remove('open');}
+function ss(n){selS=n;document.querySelectorAll('#sri span').forEach((s,i)=>s.classList.toggle('filled',i<n));}
+
+function submitP(){
+  const nm=document.getElementById('anm').value.trim();if(!nm){alert('Please enter a project name.');return;}
+  const ty=document.getElementById('aty').value,ch=document.getElementById('ach').value,st=document.getElementById('ast').value;
+  const df=document.getElementById('adf').value,rw=document.getElementById('arw').value||'TBA';
+  const ed=document.getElementById('aed').value,tw=document.getElementById('atw').value||'#';
+  const di=document.getElementById('adi').value||'#',ws=document.getElementById('aws').value||'#';
+  const nt=document.getElementById('ant').value;
+  const endD=ed?new Date(ed):dfn(30);
+  const entry={id:Date.now(),name:nm,em:'⭐',chain:ch,status:st,diff:df,reward:rw,end:endD,tw,di,ws,r:selS||3,steps:nt?nt.split('\n').filter(Boolean):['Visit official website for participation details'],src:'Manual Entry',surl:ws||'#',hid:'src:manual'};
+  if(ty==='airdrop'){AD.unshift(entry);document.getElementById('cnt-a').textContent=AD.length;rAirdrops();}
+  else if(ty==='ico'){IC.unshift({...entry,sym:nm.toUpperCase().slice(0,4),lp:'Self Listed',kyc:false,tgt:rw,fill:0,tknx:nt||'Details TBA',wp:ws});document.getElementById('cnt-i').textContent=IC.length;rICOs();}
+  else{NF.unshift({...entry,md:endD,mp:rw,supply:'TBA',mkt:'TBA'});document.getElementById('cnt-n').textContent=NF.length;rNFTs();}
+  closeAdd();
+  ['anm','arw','atw','adi','aws','asd','aed','ant'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ss(0);
+  const tmap={airdrop:'airdrops',ico:'icos',nft:'nfts'};
+  document.querySelectorAll('.tab-btn').forEach(b=>{if(b.textContent.toLowerCase().includes(tmap[ty].slice(0,-1)))b.click();});
+}
+
+['aim','adm'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
+window.addEventListener('scroll',()=>document.getElementById('stb').classList.toggle('vis',window.scrollY>300));
+
+// INIT
+rAirdrops();rICOs();rNFTs();rResearch();rNews();rLearn();
+['au','iu','nu'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Last updated: just now';});
+fetchPrices();fetchGlobal();fetchFGI();
+setInterval(fetchPrices,60000);setInterval(updCD,1000);setInterval(fetchGlobal,300000);
+</script>
+</body>
+</html>
